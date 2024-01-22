@@ -1,15 +1,17 @@
 {
   "name": "acme.sh addon for Home Assistant",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "slug": "acme-sh",
   "description": "Full ACME client to generate and renew TLS/SSL certificates",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
-  "startup": "services",
+  "startup": "application",
   "map": ["ssl:rw", "config"],
   "boot": "auto",
   "init": false,
+  "backup": "cold",
   "options": {
     "accountemail": null,
+    "acmeprovider": "zerossl",
     "domain": null,
     "dnsprovider": null,
     "dnsenvvars": [null],
@@ -19,12 +21,13 @@
   },
   "schema": {
     "accountemail": "str",
+    "acmeprovider": "list(letsencrypt|letsencrypt_test|buypass|buypass_test|zerossl|sslcom|google|googletest)",
     "domain": "str",
     "dnsprovider": "str",
     "dnsenvvars": [
       {"name": "str", "value": "str"}
     ],
-    "keylength": "match(2048|4096|ec-256|ec-384|ec-512)",
+    "keylength": "list(2048|4096|ec-256|ec-384|ec-512)",
     "fullchainfile": "str",
     "keyfile": "str"
   }

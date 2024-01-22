@@ -20,7 +20,6 @@ RUN apk --no-cache add -f \
 #Install
 RUN curl https://get.acme.sh | sh && \
     ln -s /root/.acme.sh/acme.sh /usr/local/bin/acme.sh && crontab -l | grep acme.sh | sed 's#> /dev/null##' | crontab - && \
-    sed -i 's/_dbase64 multiline/_dbase64/' /root/.acme.sh/dnsapi/dns_oci.sh && \
     cp "$LE_CONFIG_HOME/account.conf" /default_account.conf
 
 COPY rootfs/ /
