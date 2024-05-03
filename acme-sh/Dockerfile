@@ -15,7 +15,8 @@ RUN apk --no-cache add -f \
   tzdata \
   oath-toolkit-oathtool \
   tar \
-  libidn
+  libidn \
+  jq
 
 #Install
 RUN curl https://get.acme.sh | sh && \

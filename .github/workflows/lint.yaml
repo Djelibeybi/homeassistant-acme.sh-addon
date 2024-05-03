@@ -1,0 +1,31 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'acme-sh/**'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'acme-sh/**'
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+
+  lint:
+    name: Lint addon
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.1.4
+
+      - name: Run Home Assistant Add-on Lint
+        uses: frenck/action-addon-linter@v2.15
+        with:
+          path: "./acme-sh"

@@ -2,6 +2,7 @@
 # shellcheck shell=bash
 CONFIG_PATH=/data/options.json
 LE_CONFIG_HOME="/data/acme.sh"
+RESTART_SCRIPT="/usr/local/bin/restart-nginx.sh"
 
 [ ! -d "$LE_CONFIG_HOME" ] && mkdir -p "$LE_CONFIG_HOME"
 
@@ -10,8 +11,30 @@ if [ ! -f "$LE_CONFIG_HOME/account.conf" ]; then
     cp /default_account.conf "$LE_CONFIG_HOME/account.conf"
 fi
 
+if [ ! -f "$RESTART_SCRIPT" ]; then
+    bashio::log.error "Restart script not found. Please upgrade or reinstall this addon."
+fi
+
+if [ ! -x "$RESTART_SCRIPT" ]; then
+    bashio::log.info "Marking restart script executable."
+    chmod +x "$RESTART_SCRIPT"
+fi
+
+if bashio::config.is_empty 'domains'; then
+    bashio::log.fatal
+    bashio::log.fatal 'Configuration of this addon is incomplete.'
+    bashio::log.fatal
+    bashio::log.fatal 'At least one domain must be specified using the "domains" option.'
+    bashio::log.fatal
+    bashio::exit.nok
+else
+    DOMAINS=()
+    while read -r DOMAIN; do
+        DOMAINS+=( "$DOMAIN" )
+    done <<< "$(bashio::config 'domains')"
+fi
+
 ACCOUNT_EMAIL=$(bashio::config 'accountemail')
-DOMAIN=$(bashio::config 'domain')
 DNS_PROVIDER=$(bashio::config 'dnsprovider')
 ACME_PROVIDER=$(bashio::config 'acmeprovider')
 DNS_ENV_VARS=$(jq --raw-output '.dnsenvvars | map("export \(.name)='\''\(.value)'\''") | .[]' $CONFIG_PATH)
@@ -34,13 +57,14 @@ if [ ! -f "/$LE_CONFIG_HOME/.set-default" ]; then
     touch "/$LE_CONFIG_HOME/.set-default"
 fi
 
-
-bashio::log.info "Issuing certificate for domain: $DOMAIN"
-
 function issue {
     # Issue the certificate, if necessary. Exit cleanly if it exists.
+    bashio::log.info "Issuing certificates for ${DOMAINS[@]}"
+
     local RENEW_SKIP=2
-    acme.sh --issue --domain "$DOMAIN" \
+    local DOMAIN_PARAMS=$(printf " -d %s" "${DOMAINS[@]}")
+
+    acme.sh --issue ${DOMAIN_PARAMS} \
         --keylength "$KEY_LENGTH" \
         --dns "$DNS_PROVIDER" \
         || { ret=$?; [ $ret -eq ${RENEW_SKIP} ] && return 0 || return $ret ;}
@@ -48,12 +72,20 @@ function issue {
 
 issue
 
-bashio::log.info "Installing private key to /ssl/$KEY_FILE and certificate to /ssl/$FULLCHAIN_FILE"
-ECC_ARG=$( [[ ${KEY_LENGTH} == ec-* ]] && echo '--ecc' || echo '' )
+function install {
+    # Install the certificate and restart NGINX, if necessary
+    bashio::log.info "Installing private key to /ssl/$KEY_FILE and certificate to /ssl/$FULLCHAIN_FILE"
 
-# shellcheck disable=SC2086
-acme.sh --install-cert --domain "$DOMAIN" $ECC_ARG \
+    ECC_ARG=$( [[ ${KEY_LENGTH} == ec-* ]] && echo '--ecc' || echo '' )
+
+    # shellcheck disable=SC2086
+    acme.sh --install-cert --domain "${DOMAINS[0]}" $ECC_ARG \
         --key-file       "/ssl/$KEY_FILE" \
-        --fullchain-file "/ssl/$FULLCHAIN_FILE"
+        --fullchain-file "/ssl/$FULLCHAIN_FILE" \
+        --reloadcmd      "$RESTART_SCRIPT"
 
-bashio::log.info "Inital configuration complete."
+}
+
+install
+
+bashio::log.info "SSL certificate successfully issued and installed."
