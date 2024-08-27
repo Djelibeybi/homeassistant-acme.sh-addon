@@ -74,7 +74,7 @@ function issue {
     acme.sh --issue ${DOMAIN_PARAMS} \
         --keylength "$KEY_LENGTH" \
         --dns "$DNS_PROVIDER" \
-        ${DNS_CHALLENGE_ALIAS_PARAM}
+        ${DNS_CHALLENGE_ALIAS_PARAM} \
         || { ret=$?; [ $ret -eq ${RENEW_SKIP} ] && return 0 || return $ret ;}
 }
 

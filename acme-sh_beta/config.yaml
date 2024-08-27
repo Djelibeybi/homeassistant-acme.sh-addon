@@ -1,5 +1,5 @@
 name: acme.sh addon (beta)
-version: "2024.8.1"
+version: "2024.8.2"
 slug: acme-sh_beta
 image: "ghcr.io/djelibeybi/homeassistant-acme.sh-addon_beta-{arch}"
 description: >-
