@@ -1,0 +1,6 @@
+#!/usr/bin/with-contenv bashio
+# shellcheck shell=bash
+
+# Run crond
+bashio::log.info "Starting crond..."
+exec crond -f -L /dev/stdout

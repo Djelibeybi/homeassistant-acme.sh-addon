@@ -2,9 +2,16 @@
 
 This Home Assistant addon uses `acme.sh` to obtain SSL/TLS certificates from ZeroSSL or Let's Encrypt.
 
+## Currently in beta testing
+
+[DNS alias mode](https://github.com/acmesh-official/acme.sh/wiki/DNS-alias-mode) support via the `dnschallengealias`
+configuration parameter.
+
 ## Configuration
 
-Tested with the *dns_oci* configuration but It should work, the `dnsEnvVariables` can be configured with any environment required for `acme.sh` to work.
+Tested with the *dns_oci* configuration but It should work, the `dnsEnvVariables` can be configured with any environment
+variable required for `acme.sh` to work.
+
 
 ```yaml
 accountemail: mail@example.com
@@ -12,6 +19,7 @@ acmeprovider: zerossl
 domains:
   - home.example.com
 dnsprovider: dns_oci
+dnschallengealias:
 dnsenvvars:
   - name: OCI_CLI_USER
     value: xxxx
