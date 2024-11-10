@@ -1,5 +1,13 @@
 # Changelog
 
+## 2024.8.2
+
+### New features
+
+- Added support for [DNS alias mode](https://github.com/acmesh-official/acme.sh/wiki/DNS-alias-mode)
+  via the `dnschallengealias` configuration field. The content of this field (if configured) is passed
+  to the `--challenge-alias` command-line parameter of `acme.sh`.
+
 ## 2024.5.1
 
 ### BREAKING CHANGE

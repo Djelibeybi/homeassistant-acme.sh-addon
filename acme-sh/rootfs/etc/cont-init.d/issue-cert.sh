@@ -42,6 +42,13 @@ KEY_LENGTH=$(bashio::config 'keylength')
 FULLCHAIN_FILE=$(bashio::config 'fullchainfile')
 KEY_FILE=$(bashio::config 'keyfile')
 
+DNS_CHALLENGE_ALIAS_PARAM=""
+
+if bashio::config.has_value 'dnschallengealias'; then
+    DNS_CHALLENGE_ALIAS=$(bashio::config 'dnschallengealias')
+    DNS_CHALLENGE_ALIAS_PARAM=$(printf " --challenge-alias %s" "$DNS_CHALLENGE_ALIAS")
+fi
+
 # shellcheck source=/dev/null
 source <(echo "$DNS_ENV_VARS");
 
@@ -67,6 +74,7 @@ function issue {
     acme.sh --issue ${DOMAIN_PARAMS} \
         --keylength "$KEY_LENGTH" \
         --dns "$DNS_PROVIDER" \
+        ${DNS_CHALLENGE_ALIAS_PARAM} \
         || { ret=$?; [ $ret -eq ${RENEW_SKIP} ] && return 0 || return $ret ;}
 }
 
