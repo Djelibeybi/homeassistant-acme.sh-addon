@@ -1,5 +1,5 @@
 name: acme.sh addon for Home Assistant
-version: "2024.8.2"
+version: "2024.11.1"
 slug: acme-sh
 image: "ghcr.io/djelibeybi/homeassistant-acme.sh-addon-{arch}"
 description: >-
@@ -21,7 +21,7 @@ options:
   acmeprovider: zerossl
   domains: null
   dnsprovider: null
-  dnschallengealias:
+  dnschallengealias: ""
   dnsenvvars:
     - name: null
       value: null

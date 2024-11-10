@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024.11.1
+
+- Move DNS alias mode from beta to general availability.
+
 ## 2024.8.2
 
 ### New features
